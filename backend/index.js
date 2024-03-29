@@ -122,5 +122,169 @@ app.get('/allproducts', async(req,res)=>{
     let products = await Product.find({});
     res.send(products);
 })
+
+
+//schema creating for user model
+
+const Users = mongoose.model('Users',{
+    name:{
+        type : String,
+    },
+    email:{
+        type : String,
+        unique : true,
+    },
+    password:{
+        type : String,
+    },
+    cartData : {
+        type : Object,
+    },
+    date : {
+        type : Date,
+        default : Date.now,
+    }
+})
+
+// Creating Endpoint for registring the user
+
+app.post('/signup',async(req,res)=>{
+    let check = await Users.findOne({email:req.body.email});
+    if(check){
+        return res.status(400).json({
+            success : false,
+            error : "Exixting user found with this email"
+        })
+    }
+    let cart = {};
+    for(let i=0;i<300;i++){
+        cart[i] = 0;
+    }
+    const user = new Users({
+        name : req.body.name,
+        email : req.body.email,
+        password : req.body.password,
+        cartData : cart,
+
+    })
+
+    await user.save();
+
+    const data = {
+        user : {
+            id : user.id
+        }
+    }
+
+    const token = jwt.sign(data,'secret_ecom')
+    res.json({
+        success : true,
+        token
+    })
+})
+
+// Creating endpoint for user login
+
+app.post('/login',async(req,res)=>{
+    let user = await Users.findOne({email:req.body.email});
+    if(user){
+        const passCompare = req.body.password === user.password;
+        if(passCompare){
+            const data = {
+                user : {
+                    id : user.id
+                }
+            }
+            const token = jwt.sign(data,'secret_ecom')
+            res.json({
+                success : true,
+                token
+            });
+        }
+        else{
+            res.json({
+                success : false,
+                error:"Wrong Password"
+            });
+        }
+    }
+    else{
+        res.json({
+            success : false,
+            error:"Wrong email Id"
+        });
+    }
+
+})
+
+// Creating endpoint for new collection data
+
+app.get('/newcollection',async(req,res)=>{
+    let products = await Product.find({});
+    let newcollection = products.slice(1).slice(-8);
+    res.send(newcollection)
+})
+
+
+
+// Creating middleware to fetch user
+
+const fetchUser = async(req,res,next)=>{
+    const token = req.header('auth-token');
+    if(!token){
+        res.status(401).send({error : "Please authentication using valid token"})
+    }
+    else{
+        try{
+            const data = jwt.verify(token,'secret_ecom');
+            req.user = data.user;
+            next();
+        }catch(error){
+            res.status(401).send({error : "Please authentication using valid token"});
+        }
+    }
+}
+
+
+
+
+
+
+
+// Creating endpoint for adding products in cart 
+
+
+app.post('/addtocart',fetchUser,async(req,res)=>{
+    console.log(req.body,req.user);
+
+    let userData = await Users.findOne({_id:req.user.id});
+    userData.cartData[req.body.itemId] +=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.send("Added");
+})
+
+// Creating endpoint for removing products in cart 
+
+
+app.post('/removefromcart',fetchUser,async(req,res)=>{
+    console.log(req.body,req.user);
+
+    let userData = await Users.findOne({_id:req.user.id});
+    if(userData.cartData[req.body.itemId]>0){
+        userData.cartData[req.body.itemId] -=1;
+    await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+    res.send("Delete");
+    }
+})
+
+// Creating endpoint to get cartData
+
+app.post('/getcart',fetchUser,async(req,res)=>{
+    console.log("GetCart");
+    let userData = await Users.findOne({_id:req.user.id});
+    res.json(userData.cartData);
+
+})
+
 app.listen(4000,()=>console.log("hihi"))  
 
