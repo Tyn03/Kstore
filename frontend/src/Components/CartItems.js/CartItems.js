@@ -1,9 +1,12 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './CartItems.css'
 import { ShopContext } from '../../Context/ShopContext'
 import remove_icon from '../Assets/cart_cross_icon.png'
+import { Link } from 'react-router-dom'
 const CartItems = () =>{
-    const {all_product,cartItems,addToCart,removeFromCart,getTotalcartAmount} = useContext(ShopContext);
+    const [total,setTotal]=useState();
+    const {all_product,cartItems,addToCart,removeFromCart,getTotalcartAmount,makePayment} = useContext(ShopContext);
+    
     return (
         <div className='cartitems'>
             <div className='cartitems-format-main'>
@@ -54,7 +57,10 @@ const CartItems = () =>{
                             <p>Total</p>
                             <p>${getTotalcartAmount()}</p>
                         </div>
-                        <button className='cartitems-button'>PROCEED TO CHECKOUT</button>
+                        {/* <button onClick={makePayment} className='cartitems-button'>PROCEED TO CHECKOUT</button> */}
+                        
+
+                        <Link to={{ pathname: '/payment',  prices: getTotalcartAmount()  }}><button className='cartitems-button'>PROCEED TO CHECKOUT</button></Link>
                     </div>
                     <div className='cartitems-promocode'>
                         <p>If you have a promo code, Enter it here</p>

@@ -1,3 +1,4 @@
+//import dotenv from 'dotenv'
 const port = 4000;
 const express = require("express");
 const app = express();
@@ -6,9 +7,123 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const dotenv = require("dotenv");
+
+//const all_product = require('Assets/all_product');
+// Import the all_product file
+//const allProductData = require('./Assets/all_product');
+
+
+
 
 app.use(express.json());
 app.use(cors());
+
+dotenv.config();
+
+ // Stripe
+
+
+ const stripe = require('stripe')('sk_test_51P0qGnRppuYMcJ3lxjm2KXy4YhKBUxW8aNETZdRv5oMPL1OYPCWBYWFkuLbQJScCy1ZM5elsJsGIGx1UFwKW9oD100Xei7cumd');
+ const DOMAIN = 'http://localhost:3000';
+
+
+//  app.post('/create-payment-intent', async (req, res) => {
+//     const {products} = req.body;
+//     const lineItems = products.map((product)=>({
+//         price_data:{
+//             currency:"usd",
+//             product_data:{
+//                 name : product.name,
+//                 images : [product.image]
+//             },
+//             unit_amount : Math.round(product.price*100),
+//         },
+//         quantity : product.quantity
+//     }));
+
+//     const session = await stripeGateway.checkout.session.create({
+//         payment_method_type : ["card"],
+//         mode :  "payment",
+//         success_url : "${DOMAIN}/success",
+//         cancel_url : "${DOMAIN}/cancel",
+//         line_items : lineItems,
+//         billing_address_collection : "required",
+//     });
+//     res.json(session.url);
+// });
+
+
+
+// app.post("/api/create-checkout-session", async (req, res) => {
+//     const { products } = req.body;
+//     console.log(products)
+//     const lineItems = Object.entries(products).map(([id, quantity]) => {
+//         const product = allProductData.find(item => item.id === Number(id));
+//         console.log(product)
+//         return {
+//             price_data: {
+//                 currency: "inr",
+//                 product_data: {
+//                     name: product.name,
+//                     images: [product.image]
+//                 },
+//                 unit_amount: product.new_price * 100,
+//             },
+//             quantity: quantity
+//         };
+//     });
+
+//     try {
+//         const session = await stripe.checkout.sessions.create({
+//             payment_method_types: ["card"],
+//             line_items: lineItems,
+//             mode: "payment",
+//             success_url: "http://localhost:3000/success",
+//             cancel_url: "http://localhost:3000/cancel",
+//         });
+
+//         res.json({ id: session.id });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// });
+
+
+
+app.post('/create-checkout-session', async (req, res) => {
+    const { products } = req.body;
+     console.log(products)
+     const lineItems = Object.keys(products).map((id) => {
+        const product = products[id];
+         return {
+             price_data: {
+                 currency: "usd",
+                 product_data: {
+                     name: product.name,
+                 },
+                 unit_amount: product.new_price * 100,
+             },
+             quantity: products[id]
+         };
+     });
+
+     try {
+         const session = await stripe.checkout.sessions.create({
+             payment_method_types: ["card"],
+             line_items: lineItems,
+             mode: "payment",
+             success_url: "http://localhost:3000/success",
+             cancel_url: "http://localhost:3000/cancel",
+         });
+
+         res.json({ id: session.id });
+     } catch (error) {
+         res.status(500).json({ error: error.message });
+     }
+ });
+  
+
 
 
 // mongodb+srv://khang:<password>@cluster0.0qauyhg.mongodb.net/
@@ -50,7 +165,7 @@ const Product = mongoose.model("Product",{
         required : true,
     },
     name:{
-        type : String,
+        type : String,  
         required : true,
     },
      image:{
@@ -157,7 +272,7 @@ app.post('/signup',async(req,res)=>{
         })
     }
     let cart = {};
-    for(let i=0;i<300;i++){
+    for(let i=0;i<30;i++){
         cart[i] = 0;
     }
     const user = new Users({
@@ -219,11 +334,11 @@ app.post('/login',async(req,res)=>{
 
 // Creating endpoint for new collection data
 
-app.get('/newcollection',async(req,res)=>{
-    let products = await Product.find({});
-    let newcollection = products.slice(1).slice(-8);
-    res.send(newcollection)
-})
+// app.get('/newcollection',async(req,res)=>{
+//     let products = await Product.find({});
+//     let newcollection = products.slice(1).slice(-8);
+//     res.send(newcollection)
+// })
 
 
 
@@ -231,8 +346,9 @@ app.get('/newcollection',async(req,res)=>{
 
 const fetchUser = async(req,res,next)=>{
     const token = req.header('auth-token');
+    //console.log(token)
     if(!token){
-        res.status(401).send({error : "Please authentication using valid token"})
+        res.status(401).send({error : "Please authentication using valid token pls"})
     }
     else{
         try{
@@ -240,7 +356,7 @@ const fetchUser = async(req,res,next)=>{
             req.user = data.user;
             next();
         }catch(error){
-            res.status(401).send({error : "Please authentication using valid token"});
+            res.status(401).send({error : "Please authentication using valid token cak"});
         }
     }
 }
@@ -284,7 +400,69 @@ app.post('/getcart',fetchUser,async(req,res)=>{
     let userData = await Users.findOne({_id:req.user.id});
     res.json(userData.cartData);
 
+    
 })
+
+
+
+
+// advance
+const purchaseHistory = mongoose.model('Purchase',{
+    nameUser:{
+        type : String,
+    },
+    nameProduct:{
+        type : String,
+    },
+    
+    prices : {
+        type : Number,
+    },
+    cartData : {
+        type : Object,
+    },
+    date : {
+        type : Date,
+        default : Date.now,
+    }
+})
+
+app.post('/purchase',async(req,res)=>{
+    
+    const purchase = new purchaseHistory({
+        nameUser : req.body.username,
+        prices : req.body.prices,
+        cartData : req.body.cartData,
+
+    })
+    await purchase.save();
+})
+
+
+app.get('/allPurchaseHistory', async(req,res)=>{
+    let history = await purchaseHistory.find({});
+    //console.log(history)
+    res.send(history);
+})
+app.post('/getcartData', async (req, res) => {
+    console.log("GetCart");
+    console.log(req.body);
+    
+    try {
+        const userData = await purchaseHistory.findOne({});
+        if (userData) {
+            console.log("lon");
+            res.json(userData.cartData);
+        } else {
+            console.log("User data not found");
+            res.status(404).json({ error: 'User data not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching cart data:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.listen(4000,()=>console.log("hihi"))  
 
