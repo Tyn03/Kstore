@@ -23,16 +23,16 @@ const PurchaseHistory = () => {
   //   .then((data)=>{setCart(data)});
   // }
   const fetchCartData = async()=>{
-    //const authToken = localStorage.getItem('auth-token'); // Lấy mã token từ local storage
+     // Lấy mã token từ local storage
 
-      fetch('http://localhost:4000/getcartData', {
+      fetch('http://localhost:4000/getcart', {
           method: "POST",
           headers: {
               Accept: 'application/form-data',
               'Content-Type': 'application/json',
-
+              'auth-token': `${localStorage.getItem('auth-token')}`,
           },
-          body: JSON.stringify(allproducts), // Không cần gửi dữ liệu nào khác cùng với yêu cầu
+          body: "", // Không cần gửi dữ liệu nào khác cùng với yêu cầu
       })
       .then((response) => response.json())
       .then((data) => {

@@ -19,7 +19,7 @@
     border-radius: 4px;
   }
   
-  button {
+  .payment-container button {
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -28,7 +28,7 @@
     cursor: pointer;
   }
   
-  button:hover {
+  .payment-container button:hover {
     background-color: #0056b3;
   }
   

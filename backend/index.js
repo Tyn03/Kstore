@@ -446,13 +446,14 @@ app.get('/allPurchaseHistory', async(req,res)=>{
 })
 app.post('/getcartData', async (req, res) => {
     console.log("GetCart");
-    console.log(req.body);
+    //console.log(req.body);
     
     try {
-        const userData = await purchaseHistory.findOne({});
+        const userData = await purchaseHistory.findOne({ nameUser: req.body.username });
         if (userData) {
             console.log("lon");
             res.json(userData.cartData);
+            console.log(userData.cartData);
         } else {
             console.log("User data not found");
             res.status(404).json({ error: 'User data not found' });
@@ -462,6 +463,7 @@ app.post('/getcartData', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 app.listen(4000,()=>console.log("hihi"))  

@@ -15,7 +15,7 @@ import Payment from './Components/payment/payment';
 
 function App() {
   return (
-    <div>
+    <div className='app'>
       <BrowserRouter>
       <Navbar/>
       <Routes>

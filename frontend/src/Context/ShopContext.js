@@ -34,6 +34,7 @@ const ShopContextProvider = (props) =>{
             },
             body: "",
         })
+        
         .then((response) => response.json())
         .then((data) => {
             setCartItems(data);
@@ -41,6 +42,26 @@ const ShopContextProvider = (props) =>{
         });
     }
 }, [])
+
+const fetchCartData = async()=>{
+    // Lấy mã token từ local storage
+
+     fetch('http://localhost:4000/getToken', {
+         method: "POST",
+         headers: {
+             Accept: 'application/form-data',
+             'Content-Type': 'application/json',
+             'auth-token': `${localStorage.getItem('auth-token')}`,
+         },
+         body: "", // Không cần gửi dữ liệu nào khác cùng với yêu cầu
+     })
+     
+     
+ 
+ }
+useEffect(()=>{
+    fetchCartData();
+},[])
 
 
     const getCartProducts = () => {
