@@ -16,9 +16,9 @@ import Payment from './Components/payment/payment';
 function App() {
   return (
     <div className='app'>
-      <BrowserRouter>
+      <BrowserRouter basename="/Kstore">
       <Navbar/>
-      <Routes basename="/Kstore">
+      <Routes >
         <Route path='/Kstore' element={<Shop/>}/>
         <Route path='/mens' element={<ShopCategory banner={men_banner} category="men"/>}/>
         <Route path='/women' element={<ShopCategory banner={women_banner} category="women"/>}/>
