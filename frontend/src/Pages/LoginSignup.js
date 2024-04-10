@@ -27,7 +27,7 @@ const LoginSignup = () =>{
         
         if(responseData.success){
             localStorage.setItem('auth-token',responseData.token)
-            window.location.replace("/");
+            window.location.replace("/Kstore");
         }else{
             alert(responseData.error)
         }
