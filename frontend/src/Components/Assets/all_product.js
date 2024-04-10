@@ -34,13 +34,14 @@ import p33_img from "./product_33.png";
 import p34_img from "./product_34.png";
 import p35_img from "./product_35.png";
 import p36_img from "./product_36.png";
+import p37_img from './naruto_Kimono_Akatsuki.png'
 
 let all_product = [
   {
     id: 1,
     name: "1",
     category: "women",
-    image: p1_img,
+    image: p37_img,
     new_price: 50.0,
     old_price: 80.5,
   },

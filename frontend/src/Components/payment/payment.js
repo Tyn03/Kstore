@@ -38,30 +38,31 @@ const Payment = () => {
       console.error('Error making payment:', error);
     }
   }
+  
 
   return (
     <div className="payment-container">
-      <h2>Thông tin thanh toán</h2>
+      <h2>Infromation payment</h2>
       <form id="payment-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Họ và tên:</label>
+          <label htmlFor="username">Name:</label>
           <input value={formData.username} onChange={changeHandler} type="text" id="username" name="username" required />
         </div>
         <div className="form-group">
-          <label htmlFor="cardNumber">Số thẻ:</label>
+          <label htmlFor="cardNumber">Number of Cart:</label>
           <input value={formData.cardNumber} onChange={changeHandler} type="text" id="cardNumber" name="cardNumber" required />
         </div>
         <div className="form-group">
-          <label htmlFor="expiry">Hạn sử dụng:</label>
+          <label htmlFor="expiry">Expire:</label>
           <input value={formData.expiry} onChange={changeHandler} type="text" id="expiry" name="expiry" placeholder="MM/YY" required />
         </div>
         <div className="form-group">
-          <label htmlFor="cvc">Mã CVV:</label>
+          <label htmlFor="cvc">CVV:</label>
           <input value={formData.cvc} onChange={changeHandler} type="text" id="cvc" name="cvc" required />
         </div>
         
         <div>{getTotalcartAmount()}</div>
-        <button type="submit">Thanh toán</button>
+        <button type="submit">Pay</button>
       </form>
     </div>
   );
