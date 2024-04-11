@@ -29,7 +29,7 @@ const Navbar = () =>{
             </ul>
             <div className="nav-login-cart">
             {localStorage.getItem('auth-token')
-                    ?<button onClick={()=>{localStorage.removeItem('auth-token'); window.location.replace('/')}}>Log out</button>
+                    ?<button onClick={()=>{localStorage.removeItem('auth-token'); window.location.replace('/Kstore')}}>Log out</button>
                     : <button><Link style={{textDecoration : 'none'}} to='/login'>Login </Link></button>
                 }
 
