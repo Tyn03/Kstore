@@ -12,7 +12,7 @@ const Navbar = () =>{
 
     const dropdown_toggle =(e)=>{
         menuRef.current.classList.toggle('nav-menu-visible')
-        e.targer.classList.toggle('open');
+        e.target.classList.toggle('open');
     }
     return (
         <div className="Navbar">
